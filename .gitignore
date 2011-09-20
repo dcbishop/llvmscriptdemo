@@ -27,6 +27,6 @@ colladatest
 build/*
 *.swp
 core
-scripttest
+llvmscriptdemo
 *.unlinked
 *.bc

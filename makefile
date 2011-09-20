@@ -1,7 +1,7 @@
-all: scripttest bitcode/damage.bc
+all: llvmscriptdemo bitcode/damage.bc
 
-scripttest: src/scripttest.cpp obj/TestClass.o
-	clang++ src/scripttest.cpp obj/TestClass.o -fpermissive -D __STDC_LIMIT_MACROS=1 -D __STDC_CONSTANT_MACROS=1 -o scripttest `llvm-config --cxxflags --ldflags --libs`
+llvmscriptdemo: src/llvmscriptdemo.cpp obj/TestClass.o
+	clang++ src/llvmscriptdemo.cpp obj/TestClass.o -fpermissive -D __STDC_LIMIT_MACROS=1 -D __STDC_CONSTANT_MACROS=1 -o llvmscriptdemo `llvm-config --cxxflags --ldflags --libs`
 
 bitcode/TestClass.o.bc: bitcode
 	clang++ -emit-llvm src/TestClass.cpp -c -o bitcode/TestClass.o.bc
@@ -22,4 +22,4 @@ obj:
 	mkdir obj
 
 clean:
-	rm -rf scripttest bitcode/*.bc obj/*.o bitcode/*.bc.unlinked bitcode/*.o.bc
+	rm -rf llvmscriptdemo bitcode/*.bc obj/*.o bitcode/*.bc.unlinked bitcode/*.o.bc
