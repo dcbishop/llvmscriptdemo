@@ -58,7 +58,7 @@ int main()
    }
 
    initilize();
-   cout << "Running attacking script...";
+   cout << "Running attacking script..." << endl;
 
    typedef void (*attack_pfn)(TestClass*);
    attack_pfn attack = reinterpret_cast<attack_pfn>(ee->getPointerToFunction(attack_func));
