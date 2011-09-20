@@ -1,8 +1,6 @@
 #include <iostream>
 using namespace std;
 
-#include "damage.hpp"
-
 #include "../src/TestClass.hpp"
 
 void initilize() {
