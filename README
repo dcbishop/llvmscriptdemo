@@ -1,0 +1,27 @@
+This was a experiment at using LLVM as a kind of embeddable scripting language for games similar to LUA or AngelScript.
+
+The idea was to be able to use llvm to compile native C++ code at runtime and execute it at runtime. This would skip the need for any native->script object/function wrappers. Allow scripts written in C++ using the native headers rather than some specialized scripting language. Get native performance. The only problem is the scripts need to be compiled (NeverWinter Nights's NWNScript required compiling too.).
+
+The following problems where encountered:
+
+* Name mangling.
+Function are named things like "_Z9initilizev" or "_Z6attackP9TestClass" rather than "initialize" or "attack". Since there are only going to be a handful of 'hooked' functions that are called by the core application and we can guarantee that the clang compiler will be used ensuring expected mangled names mangled names can be hard-coded in by extracting the symbol names from the bitcode files with llvm-nm.
+
+* Code portability.
+LLVM's bitcode doesn't guarantee portability across architectures when using low level languages like C/C++. This could be worked around by either including the clang compiler (via libclang) and compiling for the arch on first run. Although including the whole compiler and std library headers could be fairly big it's not impossible for a game. Alternativly simply building scripts for all desired target platforms (win32, win64, linux_x86, linux_amd64, osx) or just the common ones and expecting people on odd platforms to have clang installed.
+
+* Exposing internal symbols to scripts.
+The scripts need to be able to resolve the external symbols in the core application. For example: "LVM ERROR: Program used external function '_ZNK9TestClass9getHealthEv' which could not be resolved!". A simple solution to this is to generate bitcode object files in addition to the 'native' ones and link the script's bitcode against them.
+clang++ src/TestClass.cpp -emit-llvm -c -o TestClass.bc.o
+llvm-ld damage.bc TestClass.bc.o
+
+* Security.
+The only way to secure the scripts would be to sandbox the whole thing. With that said many script engines don't bother with security (any embedded Python for example). There doesn't seem to be any decent cross platform sandbox libraries.
+
+* Distribution overhead.
+The following would be needed for a complete system. Header files for all exposed functions/object. Bitcode object files for them (and possibly everything they use too). The clang compiler and std library header files.
+
+To compile:
+make
+
+You need llvm, llvm-dev and clang++.
