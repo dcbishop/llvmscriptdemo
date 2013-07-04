@@ -18,10 +18,12 @@
 #include <limits.h>
 
 #include <llvm/LLVMContext.h>
-#include <llvm/Target/TargetSelect.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Support/MemoryBuffer.h>
+#include <llvm/Support/system_error.h>
+#include <llvm/ADT/OwningPtr.h>
 #include <llvm/Bitcode/ReaderWriter.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
-//#include <llvm/ModuleProvider.h>
 #include <llvm/Support/MemoryBuffer.h>
 #include <llvm/ExecutionEngine/JIT.h>
 #include "llvm/ExecutionEngine/GenericValue.h"
@@ -42,8 +44,14 @@ int main()
    LLVMContext context;
    string error;
 
-   // TODO: Check MemoryBuffer got a file or it will segfault
-   Module *m = ParseBitcodeFile(MemoryBuffer::getFile("bitcode/damage.bc"), context, &error);
+   OwningPtr<MemoryBuffer> mb;
+   error_code err = MemoryBuffer::getFile("bitcode/damage.bc", mb);
+   if(err) {
+      cout << "ERROR: Failed to getFile" << endl;
+      return 0;
+   }
+
+   Module *m = ParseBitcodeFile(mb.get(), context, &error);
    if(!m) {
       cout << "ERROR: Failed to load script file." << endl;
       return 0;
