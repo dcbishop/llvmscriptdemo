@@ -17,11 +17,9 @@
 #include <iostream>
 #include <limits.h>
 
-#include <llvm/LLVMContext.h>
+#include <llvm/IR/LLVMContext.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/MemoryBuffer.h>
-#include <llvm/Support/system_error.h>
-#include <llvm/ADT/OwningPtr.h>
 #include <llvm/Bitcode/ReaderWriter.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/Support/MemoryBuffer.h>
@@ -40,24 +38,22 @@ int main()
    tc.printHealth();
    
    InitializeNativeTarget();
-   llvm_start_multithreaded();
    LLVMContext context;
    string error;
 
-   OwningPtr<MemoryBuffer> mb;
-   error_code err = MemoryBuffer::getFile("bitcode/damage.bc", mb);
-   if(err) {
+   auto mb = MemoryBuffer::getFile("bitcode/damage.bc");
+   if (!mb) {
       cout << "ERROR: Failed to getFile" << endl;
       return 0;
    }
 
-   Module *m = ParseBitcodeFile(mb.get(), context, &error);
+   auto m = parseBitcodeFile(mb->get(), context);
    if(!m) {
       cout << "ERROR: Failed to load script file." << endl;
       return 0;
    }
    
-   ExecutionEngine *ee = ExecutionEngine::create(m);
+   ExecutionEngine *ee = ExecutionEngine::create(m.get());
 
    // NOTE: Function names are mangled by the compiler.
    Function* init_func = ee->FindFunctionNamed("_Z9initilizev");

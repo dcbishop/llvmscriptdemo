@@ -1,7 +1,7 @@
 all: llvmscriptdemo bitcode/damage.bc
 
 llvmscriptdemo: src/llvmscriptdemo.cpp obj/TestClass.o
-	clang++ src/llvmscriptdemo.cpp obj/TestClass.o -fpermissive -D __STDC_LIMIT_MACROS=1 -D __STDC_CONSTANT_MACROS=1 -o llvmscriptdemo `llvm-config --cxxflags --ldflags --libs`
+	clang++ src/llvmscriptdemo.cpp obj/TestClass.o -fpermissive -D __STDC_LIMIT_MACROS=1 -D __STDC_CONSTANT_MACROS=1 -o llvmscriptdemo `llvm-config --cxxflags --ldflags --libs --system-libs`
 
 bitcode/TestClass.o.bc: bitcode
 	clang++ -emit-llvm src/TestClass.cpp -c -o bitcode/TestClass.o.bc
